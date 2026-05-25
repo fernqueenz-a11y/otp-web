@@ -127,7 +127,7 @@
 
     <img
       class="logo"
-      src="https://stuck-amaranth-0gyyscdtoo.edgeone.app/phonto%20(1).png"
+      src="https://mighty-green-jm4l1to9v2.edgeone.app/logobg.png"
       alt="logo"
       onerror="this.style.display='none'"
     >
@@ -150,6 +150,44 @@
 
   </div>
 
+  function startCountdown() {
+
+  const btn = document.getElementById('searchBtn');
+
+  countdown = 15;
+
+  btn.disabled = true;
+
+  btn.style.opacity = '0.7';
+
+  btn.innerHTML = `รอ ${countdown} วิ`;
+
+  clearInterval(countdownInterval);
+
+  countdownInterval = setInterval(() => {
+
+    countdown--;
+
+    if (countdown <= 0) {
+
+      clearInterval(countdownInterval);
+
+      btn.disabled = false;
+
+      btn.style.opacity = '1';
+
+      btn.innerHTML = 'ค้นหา OTP';
+
+    } else {
+
+      btn.innerHTML = `รอ ${countdown} วิ`;
+
+    }
+
+  }, 1000);
+
+}
+      
   <script>
     const APPS_SCRIPT_URL = '/api/otp';
 
@@ -171,6 +209,7 @@
       }
 
       status.innerHTML = 'กำลังค้นหา OTP...';
+      startCountdown();
 
       try {
         const response = await fetch(APPS_SCRIPT_URL, {
@@ -251,7 +290,12 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
-  </script>
+  <script>
+
+let countdown = 15;
+let countdownInterval;
+
+async function searchOtp() {
 
 </body>
 </html>
