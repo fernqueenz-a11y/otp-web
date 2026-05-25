@@ -7,6 +7,21 @@ export default async function handler(req, res) {
   }
 
   try {
+    let bodyData = req.body;
+
+    if (typeof bodyData === 'string') {
+      bodyData = JSON.parse(bodyData);
+    }
+
+    const email = String(bodyData.email || '').trim();
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'กรุณากรอกอีเมล'
+      });
+    }
+
     const response = await fetch(
       'https://script.google.com/macros/s/AKfycbyZzmL6v_Y-PZxf1kqiqALrI8S-b2guMWypKVne8vxe18lHNqauE63Q78pnLYwx4YkZ/exec',
       {
@@ -14,7 +29,9 @@ export default async function handler(req, res) {
         headers: {
           'Content-Type': 'text/plain;charset=utf-8'
         },
-        body: JSON.stringify(req.body)
+        body: JSON.stringify({
+          email: email
+        })
       }
     );
 
@@ -26,7 +43,7 @@ export default async function handler(req, res) {
     } catch (e) {
       return res.status(500).json({
         success: false,
-        message: 'Apps Script ไม่ได้ตอบกลับเป็น JSON กรุณาเช็ค Deploy / สิทธิ์ Anyone',
+        message: 'Apps Script ไม่ได้ตอบกลับเป็น JSON',
         raw: text.substring(0, 200)
       });
     }
