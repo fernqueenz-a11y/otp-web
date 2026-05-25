@@ -151,152 +151,143 @@
   </div>
 
   <script>
-  let countdown = 15;
-  let countdownInterval;
 
-  async function searchOtp() {
+const APPS_SCRIPT_URL = '/api/otp';
 
-     function startCountdown() {
+let countdown = 15;
+let countdownInterval;
 
-     const btn = document.getElementById('searchBtn');
+async function searchOtp() {
 
-     countdown = 15;
+  const email = document.getElementById('email').value.trim();
+  const status = document.getElementById('status');
+  const result = document.getElementById('result');
 
-     btn.disabled = true;
+  result.innerHTML = '';
 
-     btn.style.opacity = '0.7';
-  
-     btn.innerHTML = `รอ ${countdown} วิ`;
+  if (!email) {
+    status.innerHTML = 'กรุณากรอกอีเมลก่อนค่ะ';
+    return;
+  }
 
-     clearInterval(countdownInterval);
+  status.innerHTML = 'กำลังค้นหา OTP...';
 
-     countdownInterval = setInterval(() => {
+  startCountdown();
 
-     countdown--;
+  try {
 
-      if (countdown <= 0) {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        email: email
+      })
+    });
 
-        clearInterval(countdownInterval);
+    const data = await response.json();
 
-        btn.disabled = false;
-
-        btn.style.opacity = '1';
-
-        btn.innerHTML = 'ค้นหา OTP';
- 
-      } else {
-
-        btn.innerHTML = `รอ ${countdown} วิ`;
- 
-       }
- 
-     }, 1000);
-
-   }
-      
-  <script>
-    const APPS_SCRIPT_URL = '/api/otp';
-
-    async function searchOtp() {
-      const email = document.getElementById('email').value.trim();
-      const status = document.getElementById('status');
-      const result = document.getElementById('result');
-
-      result.innerHTML = '';
-
-      if (!email) {
-        status.innerHTML = 'กรุณากรอกอีเมลก่อนค่ะ';
-        return;
-      }
-
-      if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-        status.innerHTML = 'ยังไม่ได้ใส่ URL Apps Script ในไฟล์ index.html';
-        return;
-      }
-
-      status.innerHTML = 'กำลังค้นหา OTP...';
-      startCountdown();
-
-      try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            email: email
-          })
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          status.innerHTML = data.message || 'ไม่พบข้อมูล';
-          return;
-        }
-
-        if (!data.mails || data.mails.length === 0) {
-          status.innerHTML = 'ไม่พบเมล หรือเมลยังไม่เข้า';
-          return;
-        }
-
-        status.innerHTML = '';
-
-        result.innerHTML = data.mails.slice(0,1).map((mail, index) => {
-
-  const otp = mail.otp || 'ไม่พบ OTP';
-
-  return `
-    <div class="card">
-
-      <div class="otp">
-        ${escapeHtml(otp)}
-      </div>
-
-      ${
-        otp !== 'ไม่พบ OTP'
-        ? `<button class="copy-btn" onclick="copyOtp('${otp}')">คัดลอก OTP</button>`
-        : `<div class="empty">ไม่พบรหัส OTP</div>`
-      }
-
-    </div>
-  `;
-
-}).join('');
-
-      } catch (err) {
-        status.innerHTML = 'เกิดข้อผิดพลาด: ' + err.message;
-      }
+    if (!data.success) {
+      status.innerHTML = data.message || 'ไม่พบข้อมูล';
+      return;
     }
 
-    function copyOtp(otp) {
-      navigator.clipboard.writeText(otp).then(() => {
-        alert('คัดลอก OTP แล้ว: ' + otp);
-      });
+    if (!data.mails || data.mails.length === 0) {
+      status.innerHTML = 'ไม่พบเมล หรือเมลยังไม่เข้า';
+      return;
     }
 
-    function formatTime(dateString) {
-      if (!dateString) return '-';
+    status.innerHTML = '';
 
-      const date = new Date(dateString);
+    result.innerHTML = data.mails.slice(0,1).map((mail) => {
 
-      return date.toLocaleString('th-TH', {
-        timeZone: 'Asia/Bangkok',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
+      const otp = mail.otp || 'ไม่พบ OTP';
+
+      return `
+        <div class="card">
+
+          <div class="otp">
+            ${escapeHtml(otp)}
+          </div>
+
+          ${
+            otp !== 'ไม่พบ OTP'
+            ? `<button class="copy-btn" onclick="copyOtp('${otp}')">คัดลอก OTP</button>`
+            : `<div class="empty">ไม่พบรหัส OTP</div>`
+          }
+
+        </div>
+      `;
+
+    }).join('');
+
+  } catch (err) {
+
+    status.innerHTML =
+      'เกิดข้อผิดพลาด: ' + err.message;
+
+  }
+
+}
+
+function startCountdown() {
+
+  const btn = document.getElementById('searchBtn');
+
+  countdown = 15;
+
+  btn.disabled = true;
+
+  btn.style.opacity = '0.7';
+
+  btn.innerHTML = `รอ ${countdown} วิ`;
+
+  clearInterval(countdownInterval);
+
+  countdownInterval = setInterval(() => {
+
+    countdown--;
+
+    if (countdown <= 0) {
+
+      clearInterval(countdownInterval);
+
+      btn.disabled = false;
+
+      btn.style.opacity = '1';
+
+      btn.innerHTML = 'ค้นหา OTP';
+
+    } else {
+
+      btn.innerHTML = `รอ ${countdown} วิ`;
+
     }
 
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-  <script>
+  }, 1000);
+
+}
+
+function copyOtp(otp) {
+
+  navigator.clipboard.writeText(otp).then(() => {
+
+    alert('คัดลอก OTP แล้ว: ' + otp);
+
+  });
+
+}
+
+function escapeHtml(text) {
+
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+</script>
 
 </body>
 </html>
