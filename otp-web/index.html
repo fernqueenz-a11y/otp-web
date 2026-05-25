@@ -192,29 +192,27 @@
 
         status.innerHTML = 'พบเมลล่าสุด ' + data.mails.length + ' รายการ';
 
-        result.innerHTML = data.mails.map((mail, index) => {
-          const otp = mail.otp || 'ไม่พบ OTP';
+        result.innerHTML = data.mails.slice(0,1).map((mail, index) => {
 
-          return `
-            <div class="card">
-              <div class="time">
-                เวลาเมลเข้า: ${formatTime(mail.createdAt)}
-              </div>
+  const otp = mail.otp || 'ไม่พบ OTP';
 
-              <div class="info">
-                <b>หัวข้อ:</b> ${escapeHtml(mail.subject || '-')}
-              </div>
+  return `
+    <div class="card">
 
-              <div class="otp">${escapeHtml(otp)}</div>
+      <div class="otp">
+        ${escapeHtml(otp)}
+      </div>
 
-              ${
-                otp !== 'ไม่พบ OTP'
-                ? `<button class="copy-btn" onclick="copyOtp('${otp}')">คัดลอก OTP</button>`
-                : `<div class="empty">ไม่พบรหัส OTP ในเมลนี้</div>`
-              }
-            </div>
-          `;
-        }).join('');
+      ${
+        otp !== 'ไม่พบ OTP'
+        ? `<button class="copy-btn" onclick="copyOtp('${otp}')">คัดลอก OTP</button>`
+        : `<div class="empty">ไม่พบรหัส OTP</div>`
+      }
+
+    </div>
+  `;
+
+}).join('');
 
       } catch (err) {
         status.innerHTML = 'เกิดข้อผิดพลาด: ' + err.message;
