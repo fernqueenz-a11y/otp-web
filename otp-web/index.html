@@ -150,43 +150,43 @@
 
   </div>
 
-  function startCountdown() {
+     function startCountdown() {
 
-  const btn = document.getElementById('searchBtn');
+     const btn = document.getElementById('searchBtn');
 
-  countdown = 15;
+     countdown = 15;
 
-  btn.disabled = true;
+     btn.disabled = true;
 
-  btn.style.opacity = '0.7';
+     btn.style.opacity = '0.7';
+  
+     btn.innerHTML = `รอ ${countdown} วิ`;
 
-  btn.innerHTML = `รอ ${countdown} วิ`;
+     clearInterval(countdownInterval);
 
-  clearInterval(countdownInterval);
+     countdownInterval = setInterval(() => {
 
-  countdownInterval = setInterval(() => {
+     countdown--;
 
-    countdown--;
+      if (countdown <= 0) {
 
-    if (countdown <= 0) {
+        clearInterval(countdownInterval);
 
-      clearInterval(countdownInterval);
+        btn.disabled = false;
 
-      btn.disabled = false;
+        btn.style.opacity = '1';
 
-      btn.style.opacity = '1';
+        btn.innerHTML = 'ค้นหา OTP';
+ 
+      } else {
 
-      btn.innerHTML = 'ค้นหา OTP';
+        btn.innerHTML = `รอ ${countdown} วิ`;
+ 
+       }
+ 
+     }, 1000);
 
-    } else {
-
-      btn.innerHTML = `รอ ${countdown} วิ`;
-
-    }
-
-  }, 1000);
-
-}
+   }
       
   <script>
     const APPS_SCRIPT_URL = '/api/otp';
